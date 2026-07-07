@@ -1,0 +1,147 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 8% 5%;
+    --foreground: 0 0% 100%;
+    --card: 240 8% 8%;
+    --card-foreground: 0 0% 100%;
+    --popover: 240 8% 7%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 147 80% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 6% 12%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 240 6% 12%;
+    --muted-foreground: 240 5% 62%;
+    --accent: 147 80% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 6% 16%;
+    --input: 240 6% 16%;
+    --ring: 147 80% 50%;
+    --radius: 1rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body), system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display), system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  .font-display {
+    font-family: var(--font-display), system-ui, sans-serif;
+  }
+  .container-dm {
+    @apply mx-auto w-full max-w-[1200px] px-5 sm:px-8;
+  }
+  .bubble {
+    @apply relative rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-sm;
+  }
+  .bubble::after {
+    content: "";
+    position: absolute;
+    left: 28px;
+    bottom: -11px;
+    width: 22px;
+    height: 22px;
+    background: inherit;
+    border-right: inherit;
+    border-bottom: inherit;
+    border-bottom-right-radius: 6px;
+    transform: rotate(45deg);
+    backdrop-filter: inherit;
+  }
+}
+
+@layer utilities {
+  .hero-glow {
+    background:
+      radial-gradient(
+        60% 55% at 72% 22%,
+        rgba(31, 218, 113, 0.55) 0%,
+        rgba(31, 218, 113, 0.12) 38%,
+        rgba(14, 14, 16, 0) 70%
+      ),
+      radial-gradient(
+        50% 45% at 40% 62%,
+        rgba(31, 218, 113, 0.22) 0%,
+        rgba(14, 14, 16, 0) 65%
+      ),
+      linear-gradient(180deg, #0a1a0f 0%, #0e0e10 55%);
+  }
+  .glow-soft {
+    background: radial-gradient(
+      circle at center,
+      rgba(31, 218, 113, 0.35) 0%,
+      rgba(31, 218, 113, 0) 70%
+    );
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #0e0e10;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2a30;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #1fda71;
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+.animate-float {
+  animation: float-slow 6s ease-in-out infinite;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-up {
+  animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
