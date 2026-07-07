@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { Send, CheckCircle, ArrowRight, Copy, ShoppingCart, RefreshCw, CreditCard } from "lucide-react";
+import { enviarConfirmacionCotizacion, notificarAdmin } from "@/lib/email";
 
 export default function CotizaPage() {
   const router = useRouter();
@@ -96,7 +97,7 @@ export default function CotizaPage() {
     setStep(3);
   };
 
-  const handleAgregarAlCarrito = (e: React.FormEvent) => {
+  const handleAgregarAlCarrito = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validarMonto(montoCotizacion)) return;
@@ -117,6 +118,23 @@ export default function CotizaPage() {
     
     carritoActual.push(productoCotizacion);
     localStorage.setItem("klyro_carrito", JSON.stringify(carritoActual));
+
+    // Enviar emails
+    await enviarConfirmacionCotizacion({
+      nombre: formData.nombre,
+      email: formData.email,
+      servicio: formData.areaInteres,
+      cotizacionId: cotizacionId,
+      monto: montoCotizacion,
+    });
+
+    await notificarAdmin({
+      nombre: formData.nombre,
+      email: formData.email,
+      servicio: formData.areaInteres,
+      cotizacionId: cotizacionId,
+      monto: montoCotizacion,
+    }, "Cotización");
     
     setStep(4);
   };
@@ -394,7 +412,6 @@ export default function CotizaPage() {
                   </p>
                 </div>
 
-                {/* ID de Cotización */}
                 <div className="mt-8 rounded-2xl border-2 border-primary/30 bg-black/30 p-6">
                   <p className="text-center text-sm font-medium text-muted-foreground">
                     TU ID DE COTIZACIÓN
@@ -403,33 +420,20 @@ export default function CotizaPage() {
                     <p className="font-mono text-3xl font-bold text-primary tracking-wider">
                       {cotizacionId}
                     </p>
-                    <button
-                      type="button"
-                      onClick={copiarIdCotizacion}
-                      className="rounded-lg bg-primary/10 p-2 text-primary transition-colors hover:bg-primary/20"
-                      title="Copiar ID"
-                    >
+                    <button type="button" onClick={copiarIdCotizacion} className="rounded-lg bg-primary/10 p-2 text-primary transition-colors hover:bg-primary/20" title="Copiar ID">
                       <Copy className="h-5 w-5" />
                     </button>
                     {modoId === "auto" && (
-                      <button
-                        type="button"
-                        onClick={regenerarId}
-                        className="rounded-lg bg-primary/10 p-2 text-primary transition-colors hover:bg-primary/20"
-                        title="Regenerar ID"
-                      >
+                      <button type="button" onClick={regenerarId} className="rounded-lg bg-primary/10 p-2 text-primary transition-colors hover:bg-primary/20" title="Regenerar ID">
                         <RefreshCw className="h-5 w-5" />
                       </button>
                     )}
                   </div>
                   <p className="mt-3 text-center text-xs text-muted-foreground">
-                    {modoId === "auto"
-                      ? "Copia este ID o genera uno nuevo"
-                      : "Copia este ID para tu referencia"}
+                    {modoId === "auto" ? "Copia este ID o genera uno nuevo" : "Copia este ID para tu referencia"}
                   </p>
                 </div>
 
-                {/* Detalles del pedido */}
                 <div className="mt-6 rounded-xl border border-white/10 bg-white/[0.02] p-4">
                   <h3 className="font-semibold text-white">Resumen de tu solicitud:</h3>
                   <div className="mt-3 space-y-2 text-sm text-muted-foreground">
@@ -440,10 +444,7 @@ export default function CotizaPage() {
                   </div>
                 </div>
 
-                <button
-                  onClick={handleIrAPago}
-                  className="mt-8 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-4 text-base font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:brightness-110 active:scale-95"
-                >
+                <button onClick={handleIrAPago} className="mt-8 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-4 text-base font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:brightness-110 active:scale-95">
                   Continuar
                   <ArrowRight className="h-5 w-5" />
                 </button>
@@ -465,7 +466,6 @@ export default function CotizaPage() {
                     Fija el monto de tu cotización. Este será el valor que aparecerá en tu carrito de compras.
                   </p>
 
-                  {/* ID de cotización */}
                   <div className="mb-6 rounded-xl border border-primary/20 bg-primary/5 p-4">
                     <p className="text-xs text-muted-foreground">ID de Cotización:</p>
                     <p className="mt-1 font-mono text-lg font-bold text-primary">{cotizacionId}</p>
@@ -493,9 +493,7 @@ export default function CotizaPage() {
                           placeholder="0.00"
                         />
                       </div>
-                      {errorMonto && (
-                        <p className="mt-1 text-xs text-red-400">{errorMonto}</p>
-                      )}
+                      {errorMonto && <p className="mt-1 text-xs text-red-400">{errorMonto}</p>}
                       {!errorMonto && montoCotizacion && (
                         <p className="mt-1 text-xs text-muted-foreground">
                           + IVA (16%): {parseFloat(montoCotizacion) > 0 ? (parseFloat(montoCotizacion) * 0.16).toLocaleString("es-MX", { style: "currency", currency: "MXN" }) : "$0.00"}
@@ -504,10 +502,7 @@ export default function CotizaPage() {
                     </div>
                   </div>
 
-                  <button
-                    type="submit"
-                    className="mt-8 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-4 text-base font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:brightness-110 active:scale-95"
-                  >
+                  <button type="submit" className="mt-8 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-4 text-base font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:brightness-110 active:scale-95">
                     <ShoppingCart className="h-5 w-5" />
                     Agregar al Carrito
                   </button>
@@ -515,7 +510,7 @@ export default function CotizaPage() {
               </form>
             )}
 
-            {/* Step 4: Confirmación de agregado al carrito */}
+            {/* Step 4: Confirmación */}
             {step === 4 && (
               <div className="rounded-2xl border border-primary/30 bg-primary/5 p-8 text-center backdrop-blur-sm">
                 <ShoppingCart className="mx-auto h-16 w-16 text-primary" />
@@ -523,7 +518,7 @@ export default function CotizaPage() {
                   ¡Agregado al Carrito!
                 </h2>
                 <p className="mt-3 text-muted-foreground">
-                  Tu artículo se ha agregado al carrito correctamente. Te invitamos a revisar tu bandeja de correo para ver la confirmación.
+                  Tu artículo se ha agregado al carrito correctamente. Te hemos enviado un correo de confirmación a {formData.email}.
                 </p>
                 
                 <div className="mt-6 rounded-xl border border-white/10 bg-white/[0.02] p-4 text-left">
@@ -534,17 +529,11 @@ export default function CotizaPage() {
                 </div>
 
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-                  <a
-                    href="/carrito"
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-8 py-3 font-semibold text-white transition-all hover:brightness-110 active:scale-95"
-                  >
+                  <a href="/carrito" className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-8 py-3 font-semibold text-white transition-all hover:brightness-110 active:scale-95">
                     <ShoppingCart className="h-5 w-5" />
                     Ver Carrito
                   </a>
-                  <a
-                    href="/"
-                    className="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 px-8 py-3 font-semibold text-muted-foreground transition-all hover:border-primary/30 hover:text-white"
-                  >
+                  <a href="/" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 px-8 py-3 font-semibold text-muted-foreground transition-all hover:border-primary/30 hover:text-white">
                     Volver al Inicio
                   </a>
                 </div>

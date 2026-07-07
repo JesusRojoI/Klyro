@@ -14,6 +14,7 @@ import {
   ChevronUp,
   Tag
 } from "lucide-react";
+import { enviarConfirmacionCompra, notificarAdmin } from "@/lib/email";
 
 interface ProductoCarrito {
   id: number;
@@ -22,11 +23,13 @@ interface ProductoCarrito {
   tipo: string;
   cantidad: number;
   fecha: string;
+  cotizacionId?: string;
 }
 
 export default function FinalizarCompraPage() {
   const router = useRouter();
   const [carrito, setCarrito] = useState<ProductoCarrito[]>([]);
+  const [loading, setLoading] = useState(false);
   const [cuponAbierto, setCuponAbierto] = useState(false);
   const [codigoCupon, setCodigoCupon] = useState("");
   const [cuponAplicado, setCuponAplicado] = useState(false);
@@ -98,11 +101,10 @@ export default function FinalizarCompraPage() {
   };
 
   const aplicarCupon = () => {
-    // Cupones de ejemplo
     const cupones: { [key: string]: number } = {
-      "KLYRO10": 0.10, // 10% descuento
-      "KLYRO20": 0.20, // 20% descuento
-      "BIENVENIDO": 0.15, // 15% descuento
+      "KLYRO10": 0.10,
+      "KLYRO20": 0.20,
+      "BIENVENIDO": 0.15,
     };
 
     if (cupones[codigoCupon.toUpperCase()]) {
@@ -117,19 +119,90 @@ export default function FinalizarCompraPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const generarIdOrden = () => {
+    return `ORD-${Date.now().toString(36).toUpperCase()}`;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validaciones básicas
     if (!formData.nombre || !formData.apellidos || !formData.email) {
       alert("Por favor completa los campos obligatorios");
       return;
     }
 
-    // Aquí iría la lógica de procesamiento de pago
-    alert("¡Pedido procesado con éxito! Gracias por tu compra.");
-    localStorage.removeItem("klyro_carrito");
-    router.push("/");
+    setLoading(true);
+    const orderId = generarIdOrden();
+    const nombreCompleto = `${formData.nombre} ${formData.apellidos}`;
+    
+    try {
+      // Crear pago en Octano
+      console.log('💳 [PAGO] Procesando pago...');
+      const response = await fetch('/api/create-payment', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    amount: calcularTotal(),
+    description: `Orden ${orderId} - Klyro`,
+    customerName: nombreCompleto,
+    customerEmail: formData.email,
+    orderId,
+    cardData: {
+      numeroTarjeta: formData.numeroTarjeta,
+      nombreTarjeta: formData.nombreTarjeta,
+      fechaExpiracion: formData.fechaExpiracion,
+      cvv: formData.cvv,
+    },
+  }),
+});
+
+      const result = await response.json();
+      console.log('💳 [PAGO] Resultado:', result);
+
+      if (result.success) {
+        // Enviar emails de confirmación
+        console.log('📧 [EMAIL] Enviando confirmaciones...');
+        
+        await enviarConfirmacionCompra({
+          nombre: formData.nombre,
+          email: formData.email,
+          productos: carrito,
+          total: formatearPrecio(calcularTotal()),
+        });
+
+        await notificarAdmin({
+          nombre: nombreCompleto,
+          email: formData.email,
+          total: formatearPrecio(calcularTotal()),
+        }, "Compra");
+
+        // Guardar orden para mostrarla en compra-exitosa
+        const orden = {
+          orderId,
+          nombre: nombreCompleto,
+          email: formData.email,
+          productos: carrito,
+          subtotal: calcularSubtotal(),
+          iva: calcularIVA(),
+          descuento,
+          total: calcularTotal(),
+          fecha: new Date().toISOString(),
+        };
+        localStorage.setItem("klyro_ultima_orden", JSON.stringify(orden));
+        localStorage.removeItem("klyro_carrito");
+
+        // Redirigir a compra exitosa
+        router.push("/compra-exitosa");
+      } else {
+        console.error('❌ [PAGO] Error:', result.error);
+        alert("Error al procesar el pago. Por favor intenta de nuevo.");
+      }
+    } catch (error) {
+      console.error('❌ [PAGO] Error de conexión:', error);
+      alert("Error de conexión. Por favor intenta de nuevo.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -167,43 +240,21 @@ export default function FinalizarCompraPage() {
                       <label className="mb-2 block text-sm font-medium text-white">
                         Nombre *
                       </label>
-                      <input
-                        type="text"
-                        name="nombre"
-                        value={formData.nombre}
-                        onChange={handleChange}
-                        required
-                        className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                        placeholder="Nombre"
-                      />
+                      <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} required className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Nombre" />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-white">
                         Apellidos *
                       </label>
-                      <input
-                        type="text"
-                        name="apellidos"
-                        value={formData.apellidos}
-                        onChange={handleChange}
-                        required
-                        className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                        placeholder="Apellidos"
-                      />
+                      <input type="text" name="apellidos" value={formData.apellidos} onChange={handleChange} required className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Apellidos" />
                     </div>
 
                     <div className="sm:col-span-2">
                       <label className="mb-2 block text-sm font-medium text-white">
                         País / Región *
                       </label>
-                      <select
-                        name="pais"
-                        value={formData.pais}
-                        onChange={handleChange}
-                        required
-                        className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                      >
+                      <select name="pais" value={formData.pais} onChange={handleChange} required className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
                         <option value="México">México</option>
                         <option value="Estados Unidos">Estados Unidos</option>
                         <option value="Canadá">Canadá</option>
@@ -217,56 +268,28 @@ export default function FinalizarCompraPage() {
                       <label className="mb-2 block text-sm font-medium text-white">
                         Dirección de la calle *
                       </label>
-                      <input
-                        type="text"
-                        name="direccion"
-                        value={formData.direccion}
-                        onChange={handleChange}
-                        required
-                        className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                        placeholder="Nombre de la calle y número de la casa"
-                      />
+                      <input type="text" name="direccion" value={formData.direccion} onChange={handleChange} required className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Nombre de la calle y número de la casa" />
                     </div>
 
                     <div className="sm:col-span-2">
                       <label className="mb-2 block text-sm font-medium text-muted-foreground">
                         Apartamento, habitación, escalera, etc. (opcional)
                       </label>
-                      <input
-                        type="text"
-                        name="apartamento"
-                        value={formData.apartamento}
-                        onChange={handleChange}
-                        className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                        placeholder="Apartamento, habitación, etc. (opcional)"
-                      />
+                      <input type="text" name="apartamento" value={formData.apartamento} onChange={handleChange} className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Apartamento, habitación, etc. (opcional)" />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-white">
                         Población *
                       </label>
-                      <input
-                        type="text"
-                        name="poblacion"
-                        value={formData.poblacion}
-                        onChange={handleChange}
-                        required
-                        className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                      />
+                      <input type="text" name="poblacion" value={formData.poblacion} onChange={handleChange} required className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-white">
                         Región / Provincia *
                       </label>
-                      <select
-                        name="region"
-                        value={formData.region}
-                        onChange={handleChange}
-                        required
-                        className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                      >
+                      <select name="region" value={formData.region} onChange={handleChange} required className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
                         <option value="Ciudad de México">Ciudad de México</option>
                         <option value="Estado de México">Estado de México</option>
                         <option value="Jalisco">Jalisco</option>
@@ -280,57 +303,28 @@ export default function FinalizarCompraPage() {
                       <label className="mb-2 block text-sm font-medium text-white">
                         Código postal / ZIP *
                       </label>
-                      <input
-                        type="text"
-                        name="codigoPostal"
-                        value={formData.codigoPostal}
-                        onChange={handleChange}
-                        required
-                        className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                      />
+                      <input type="text" name="codigoPostal" value={formData.codigoPostal} onChange={handleChange} required className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
                     </div>
 
                     <div>
                       <label className="mb-2 block text-sm font-medium text-muted-foreground">
                         Teléfono (opcional)
                       </label>
-                      <input
-                        type="tel"
-                        name="telefono"
-                        value={formData.telefono}
-                        onChange={handleChange}
-                        className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                        placeholder="Teléfono"
-                      />
+                      <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Teléfono" />
                     </div>
 
                     <div className="sm:col-span-2">
                       <label className="mb-2 block text-sm font-medium text-white">
                         Dirección de correo electrónico *
                       </label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                        className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                        placeholder="Dirección de correo electrónico"
-                      />
+                      <input type="email" name="email" value={formData.email} onChange={handleChange} required className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Dirección de correo electrónico" />
                     </div>
 
                     <div className="sm:col-span-2">
                       <label className="mb-2 block text-sm font-medium text-muted-foreground">
                         Notas del pedido (opcional)
                       </label>
-                      <textarea
-                        name="notas"
-                        value={formData.notas}
-                        onChange={handleChange}
-                        rows={3}
-                        className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                        placeholder="Notas sobre tu pedido, por ejemplo, notas especiales para la entrega."
-                      />
+                      <textarea name="notas" value={formData.notas} onChange={handleChange} rows={3} className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Notas sobre tu pedido, por ejemplo, notas especiales para la entrega." />
                     </div>
                   </div>
                 </div>
@@ -353,15 +347,7 @@ export default function FinalizarCompraPage() {
                       <label className="mb-2 block text-sm font-medium text-white">
                         Nombre en la tarjeta
                       </label>
-                      <input
-                        type="text"
-                        name="nombreTarjeta"
-                        value={formData.nombreTarjeta}
-                        onChange={handleChange}
-                        required
-                        className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                        placeholder="John Doe"
-                      />
+                      <input type="text" name="nombreTarjeta" value={formData.nombreTarjeta} onChange={handleChange} required className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" placeholder="John Doe" />
                     </div>
 
                     <div>
@@ -369,16 +355,7 @@ export default function FinalizarCompraPage() {
                         Número de tarjeta
                       </label>
                       <div className="relative">
-                        <input
-                          type="text"
-                          name="numeroTarjeta"
-                          value={formData.numeroTarjeta}
-                          onChange={handleChange}
-                          required
-                          maxLength={19}
-                          className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                          placeholder="•••• •••• •••• ••••"
-                        />
+                        <input type="text" name="numeroTarjeta" value={formData.numeroTarjeta} onChange={handleChange} required maxLength={19} className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" placeholder="•••• •••• •••• ••••" />
                         <Lock className="absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       </div>
                     </div>
@@ -388,39 +365,21 @@ export default function FinalizarCompraPage() {
                         <label className="mb-2 block text-sm font-medium text-white">
                           MM/AA
                         </label>
-                        <input
-                          type="text"
-                          name="fechaExpiracion"
-                          value={formData.fechaExpiracion}
-                          onChange={handleChange}
-                          required
-                          maxLength={5}
-                          className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                          placeholder="MM / YY"
-                        />
+                        <input type="text" name="fechaExpiracion" value={formData.fechaExpiracion} onChange={handleChange} required maxLength={5} className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" placeholder="MM / YY" />
                       </div>
 
                       <div>
                         <label className="mb-2 block text-sm font-medium text-white">
                           CVV
                         </label>
-                        <input
-                          type="text"
-                          name="cvv"
-                          value={formData.cvv}
-                          onChange={handleChange}
-                          required
-                          maxLength={4}
-                          className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                          placeholder="•••"
-                        />
+                        <input type="text" name="cvv" value={formData.cvv} onChange={handleChange} required maxLength={4} className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" placeholder="•••" />
                       </div>
                     </div>
                   </div>
 
                   <div className="mt-6 flex items-center gap-2 text-xs text-muted-foreground">
                     <Shield className="h-4 w-4 text-primary" />
-                    Sus datos personales se utilizarán para procesar su pedido, respaldar su experiencia en este sitio web y para otros fines descritos en nuestra política de privacidad.
+                    Sus datos personales se utilizarán para procesar su pedido.
                   </div>
                 </div>
               </div>
@@ -432,7 +391,6 @@ export default function FinalizarCompraPage() {
                     Tu pedido
                   </h3>
                   
-                  {/* Tabla de productos */}
                   <div className="mt-6">
                     <div className="grid grid-cols-3 gap-2 border-b border-white/10 pb-3 text-xs font-medium text-muted-foreground">
                       <span className="col-span-2">Producto</span>
@@ -442,16 +400,15 @@ export default function FinalizarCompraPage() {
                     {carrito.map((item) => (
                       <div key={item.id} className="grid grid-cols-3 gap-2 border-b border-white/5 py-3 text-sm">
                         <span className="col-span-2 text-muted-foreground">
-                          {item.tipo} - {item.nombre} × {item.cantidad}
+                          {item.nombre} × {item.cantidad}
                         </span>
                         <span className="text-right text-white">
-                          {formatearPrecio(extraerPrecio(item.precio) * item.cantidad)}
+                          {item.precio === "A cotizar" ? "A cotizar" : formatearPrecio(extraerPrecio(item.precio) * item.cantidad)}
                         </span>
                       </div>
                     ))}
                   </div>
 
-                  {/* Totales */}
                   <div className="mt-4 space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Subtotal</span>
@@ -479,38 +436,18 @@ export default function FinalizarCompraPage() {
 
                   {/* Cupón */}
                   <div className="mt-6 border-t border-white/10 pt-4">
-                    <button
-                      type="button"
-                      onClick={() => setCuponAbierto(!cuponAbierto)}
-                      className="flex w-full items-center justify-between text-sm text-muted-foreground transition-colors hover:text-white"
-                    >
+                    <button type="button" onClick={() => setCuponAbierto(!cuponAbierto)} className="flex w-full items-center justify-between text-sm text-muted-foreground transition-colors hover:text-white">
                       <span className="flex items-center gap-2">
                         <Tag className="h-4 w-4" />
                         ¿Tienes un cupón?
                       </span>
-                      {cuponAbierto ? (
-                        <ChevronUp className="h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="h-4 w-4" />
-                      )}
+                      {cuponAbierto ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                     </button>
                     
                     {cuponAbierto && (
                       <div className="mt-3 space-y-2">
-                        <input
-                          type="text"
-                          value={codigoCupon}
-                          onChange={(e) => setCodigoCupon(e.target.value)}
-                          className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2 text-sm text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                          placeholder="Código de cupón"
-                        />
-                        <button
-                          type="button"
-                          onClick={aplicarCupon}
-                          className="w-full rounded-full border border-primary/30 px-4 py-2 text-sm text-primary transition-colors hover:bg-primary/10"
-                        >
-                          Aplicar cupón
-                        </button>
+                        <input type="text" value={codigoCupon} onChange={(e) => setCodigoCupon(e.target.value)} className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2 text-sm text-white placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Código de cupón" />
+                        <button type="button" onClick={aplicarCupon} className="w-full rounded-full border border-primary/30 px-4 py-2 text-sm text-primary transition-colors hover:bg-primary/10">Aplicar cupón</button>
                         {cuponAplicado && (
                           <p className="flex items-center gap-1 text-xs text-primary">
                             <CheckCircle2 className="h-3 w-3" />
@@ -522,48 +459,37 @@ export default function FinalizarCompraPage() {
                   </div>
 
                   {/* Botón de pago */}
-                  <button
-                    type="submit"
-                    className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-4 text-base font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:brightness-110 active:scale-95"
-                  >
-                    <Lock className="h-5 w-5" />
-                    Pagar {formatearPrecio(calcularTotal())}
+                  <button type="submit" disabled={loading} className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-4 text-base font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:brightness-110 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                    {loading ? (
+                      "Procesando..."
+                    ) : (
+                      <>
+                        <Lock className="h-5 w-5" />
+                        Pagar {formatearPrecio(calcularTotal())}
+                      </>
+                    )}
                   </button>
 
-                  <a
-                    href="/carrito"
-                    className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-white/10 px-6 py-3 text-sm text-muted-foreground transition-all hover:border-primary/30 hover:text-white"
-                  >
+                  <a href="/carrito" className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-white/10 px-6 py-3 text-sm text-muted-foreground transition-all hover:border-primary/30 hover:text-white">
                     <ArrowLeft className="h-4 w-4" />
                     Volver al carrito
                   </a>
 
-                  {/* Métodos de pago */}
                   {/* Métodos de pago y seguridad */}
-<div className="mt-6 space-y-3">
-  <div className="flex items-center justify-center gap-4 rounded-xl border border-white/10 bg-white/[0.02] p-3">
-    <img
-      src="/octano_logo.svg"
-      alt="Octano - Pasarela de pago"
-      className="h-7 w-auto"
-      style={{ filter: "brightness(0) invert(1)" }}
-    />
-    <div className="h-6 w-px bg-white/10" />
-    <img
-      src="/secure_logo.svg"
-      alt="SSL Seguro"
-      className="h-7 w-auto"
-      style={{ filter: "brightness(0) invert(1)" }}
-    />
-  </div>
-  <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-    <Shield className="h-3 w-3 text-primary" />
-    Pago seguro SSL
-    <span className="text-white/20">|</span>
-    <CreditCard className="h-3 w-3 text-primary" />
-    Visa, Mastercard
-  </div>
-</div>
+                  <div className="mt-6 space-y-3">
+                    <div className="flex items-center justify-center gap-4 rounded-xl border border-white/10 bg-white/[0.02] p-3">
+                      <img src="/octano_logo.svg" alt="Octano - Pasarela de pago" className="h-7 w-auto" style={{ filter: "brightness(0) invert(1)" }} />
+                      <div className="h-6 w-px bg-white/10" />
+                      <img src="/secure_logo.svg" alt="SSL Seguro" className="h-7 w-auto" style={{ filter: "brightness(0) invert(1)" }} />
+                    </div>
+                    <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                      <Shield className="h-3 w-3 text-primary" />
+                      Pago seguro SSL
+                      <span className="text-white/20">|</span>
+                      <CreditCard className="h-3 w-3 text-primary" />
+                      Visa, Mastercard
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
