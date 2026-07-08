@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
@@ -11,72 +11,91 @@ import {
   Sparkles,
   FileText
 } from "lucide-react";
-
-const planes = [
-  {
-    id: 201,
-    nombre: "Aplicación Básica",
-    precio: "9,500 MXN + IVA",
-    descripcion: "Funcionalidades limitadas, sin bases de datos complejas, diseño estándar.",
-    icono: FileText,
-    caracteristicas: [
-      "Hasta 5 pantallas",
-      "Diseño responsivo básico",
-      "Formulario de contacto",
-      "Hosting incluido 1 año",
-      "Soporte técnico 3 meses",
-      "SEO básico",
-    ],
-    color: "from-emerald-500/20 to-green-500/20",
-    borderColor: "border-emerald-500/30",
-    badgeColor: "bg-emerald-500/20 text-emerald-400",
-  },
-  {
-    id: 202,
-    nombre: "Aplicación Intermedia",
-    precio: "19,000 MXN + IVA",
-    descripcion: "Integración con bases de datos, panel de administración, diseño personalizado.",
-    icono: Layers,
-    caracteristicas: [
-      "Hasta 15 pantallas",
-      "Base de datos integrada",
-      "Panel de administración",
-      "Diseño UX/UI personalizado",
-      "Autenticación de usuarios",
-      "Hosting incluido 2 años",
-      "Soporte técnico 6 meses",
-      "SEO avanzado",
-    ],
-    color: "from-primary/30 to-primary/10",
-    borderColor: "border-primary/30",
-    badgeColor: "bg-primary/20 text-primary",
-  },
-  {
-    id: 203,
-    nombre: "Aplicación Avanzada",
-    precio: "27,000 MXN + IVA",
-    descripcion: "Integraciones con APIs externas, funcionalidades avanzadas, diseño UX/UI sofisticado.",
-    icono: Sparkles,
-    caracteristicas: [
-      "Pantallas ilimitadas",
-      "APIs externas integradas",
-      "Panel de administración avanzado",
-      "Diseño UX/UI premium",
-      "Notificaciones push",
-      "Pasarela de pagos",
-      "Hosting incluido 3 años",
-      "Soporte técnico 12 meses",
-      "SEO premium + analíticas",
-    ],
-    color: "from-violet-500/20 to-purple-500/20",
-    borderColor: "border-violet-500/30",
-    badgeColor: "bg-violet-500/20 text-violet-400",
-  },
-];
+import { t, getLanguage } from "@/i18n";
 
 export default function DesarrolloAplicacionesPage() {
   const router = useRouter();
   const [planSeleccionado, setPlanSeleccionado] = useState<number | null>(null);
+  const [lang, setLang] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLang(getLanguage());
+    const handleLangChange = () => setLang(getLanguage());
+    window.addEventListener("languagechange", handleLangChange);
+    return () => window.removeEventListener("languagechange", handleLangChange);
+  }, []);
+
+  if (!lang) {
+    return (
+      <main className="relative min-h-screen bg-background">
+        <Navbar />
+        <section className="pt-32 pb-20"><div className="container-dm" /></section>
+        <Footer />
+      </main>
+    );
+  }
+
+  const planes = [
+    {
+      id: 201,
+      nombre: t("app_dev.basic"),
+      precio: `9,500 MXN ${t("common.tax")}`,
+      descripcion: t("app_dev.basic_desc"),
+      icono: FileText,
+      caracteristicas: [
+        t("app_dev.basic_1"),
+        t("app_dev.basic_2"),
+        t("app_dev.basic_3"),
+        t("app_dev.basic_4"),
+        t("app_dev.basic_5"),
+        t("app_dev.basic_6"),
+      ],
+      color: "from-emerald-500/20 to-green-500/20",
+      borderColor: "border-emerald-500/30",
+      badgeColor: "bg-emerald-500/20 text-emerald-400",
+    },
+    {
+      id: 202,
+      nombre: t("app_dev.intermediate"),
+      precio: `19,000 MXN ${t("common.tax")}`,
+      descripcion: t("app_dev.intermediate_desc"),
+      icono: Layers,
+      caracteristicas: [
+        t("app_dev.intermediate_1"),
+        t("app_dev.intermediate_2"),
+        t("app_dev.intermediate_3"),
+        t("app_dev.intermediate_4"),
+        t("app_dev.intermediate_5"),
+        t("app_dev.intermediate_6"),
+        t("app_dev.intermediate_7"),
+        t("app_dev.intermediate_8"),
+      ],
+      color: "from-primary/30 to-primary/10",
+      borderColor: "border-primary/30",
+      badgeColor: "bg-primary/20 text-primary",
+    },
+    {
+      id: 203,
+      nombre: t("app_dev.advanced"),
+      precio: `27,000 MXN ${t("common.tax")}`,
+      descripcion: t("app_dev.advanced_desc"),
+      icono: Sparkles,
+      caracteristicas: [
+        t("app_dev.advanced_1"),
+        t("app_dev.advanced_2"),
+        t("app_dev.advanced_3"),
+        t("app_dev.advanced_4"),
+        t("app_dev.advanced_5"),
+        t("app_dev.advanced_6"),
+        t("app_dev.advanced_7"),
+        t("app_dev.advanced_8"),
+        t("app_dev.advanced_9"),
+      ],
+      color: "from-violet-500/20 to-purple-500/20",
+      borderColor: "border-violet-500/30",
+      badgeColor: "bg-violet-500/20 text-violet-400",
+    },
+  ];
 
   const handleSeleccionarPlan = (planId: number) => {
     setPlanSeleccionado(planId);
@@ -105,36 +124,34 @@ export default function DesarrolloAplicacionesPage() {
     <main className="relative min-h-screen bg-background">
       <Navbar />
       
-      {/* Hero Section */}
       <section className="relative overflow-hidden pt-32 pb-20">
         <div className="pointer-events-none absolute -right-40 top-24 h-[520px] w-[520px] rounded-full bg-primary/15 blur-[130px]" />
         <div className="pointer-events-none absolute bottom-0 left-1/2 h-[380px] w-[720px] -translate-x-1/2 bg-primary/8 blur-[120px]" />
 
         <div className="container-dm relative">
           <div className="mb-8 flex items-center gap-2 text-sm text-muted-foreground">
-            <a href="/" className="hover:text-primary transition-colors">Inicio</a>
+            <a href="/" className="hover:text-primary transition-colors">{t("app_dev.breadcrumb_home")}</a>
             <span>/</span>
-            <a href="#servicios" className="hover:text-primary transition-colors">Planes de Desarrollo</a>
+            <a href="/#servicios" className="hover:text-primary transition-colors">{t("app_dev.breadcrumb_plans")}</a>
             <span>/</span>
-            <span className="text-white">Desarrollo de Aplicaciones</span>
+            <span className="text-white">{t("app_dev.title")}</span>
           </div>
 
           <div className="text-center">
             <h1 className="font-display text-4xl font-bold text-white sm:text-5xl lg:text-6xl">
-              Desarrollo de <span className="text-primary">Aplicaciones</span>
+              {t("app_dev.heading")}
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
-              Creamos aplicaciones modernas, seguras y escalables para web y dispositivos móviles, adaptadas a las necesidades de tu negocio.
+              {t("app_dev.description")}
             </p>
           </div>
 
-          {/* Imagen decorativa */}
           <div className="mt-12 flex justify-center">
             <div className="relative">
               <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-primary/20 to-emerald-500/20 blur-3xl" />
               <img
                 src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=300&fit=crop"
-                alt="Desarrollo de aplicaciones Klyro"
+                alt={t("app_dev.image_alt")}
                 className="relative h-48 w-full max-w-[600px] rounded-3xl border border-white/10 object-cover backdrop-blur-sm sm:h-64"
               />
             </div>
@@ -142,15 +159,14 @@ export default function DesarrolloAplicacionesPage() {
         </div>
       </section>
 
-      {/* Planes Section */}
       <section className="py-20">
         <div className="container-dm">
           <div className="text-center">
             <h2 className="font-display text-3xl font-bold text-white sm:text-4xl">
-              Conoce Nuestros Planes
+              {t("app_dev.plans_title")}
             </h2>
             <p className="mt-4 text-muted-foreground">
-              Elige el plan que mejor se adapte a tu proyecto
+              {t("app_dev.plans_subtitle")}
             </p>
           </div>
 
@@ -163,7 +179,7 @@ export default function DesarrolloAplicacionesPage() {
               >
                 <div className="flex flex-col h-full p-8">
                   <div className={`inline-flex h-10 w-10 items-center justify-center rounded-xl ${plan.badgeColor} text-sm font-bold`}>
-                    0{plan.id}
+                    {plan.id === 201 ? "01" : plan.id === 202 ? "02" : "03"}
                   </div>
 
                   <div className={`mt-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${plan.color} border ${plan.borderColor}`}>
@@ -198,11 +214,11 @@ export default function DesarrolloAplicacionesPage() {
                     {planSeleccionado === plan.id ? (
                       <>
                         <CheckCircle2 className="h-4 w-4" />
-                        Plan Seleccionado
+                        {t("app_dev.plan_selected")}
                       </>
                     ) : (
                       <>
-                        Seleccionar Plan
+                        {t("app_dev.select_plan")}
                         <ArrowRight className="h-4 w-4" />
                       </>
                     )}
@@ -215,14 +231,13 @@ export default function DesarrolloAplicacionesPage() {
           {planSeleccionado && (
             <div className="animate-fade-up mt-12 text-center">
               <p className="text-sm text-muted-foreground">
-                Has seleccionado: <span className="font-semibold text-primary">{planes.find(p => p.id === planSeleccionado)?.nombre}</span>
+                {t("app_dev.selected")}: <span className="font-semibold text-primary">{planes.find(p => p.id === planSeleccionado)?.nombre}</span>
               </p>
             </div>
           )}
         </div>
       </section>
 
-      {/* CTA Final con tarjeta e imagen */}
       <section className="py-20">
         <div className="container-dm">
           <div className="animate-fade-up relative overflow-hidden rounded-3xl border border-primary/30 bg-gradient-to-br from-primary/10 via-background to-emerald-500/10 backdrop-blur-sm">
@@ -233,29 +248,29 @@ export default function DesarrolloAplicacionesPage() {
               <div className="z-10">
                 <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-sm text-primary">
                   <Sparkles className="h-4 w-4" />
-                  ¿Listo para empezar?
+                  {t("app_dev.cta_badge")}
                 </div>
                 
                 <h2 className="mt-6 font-display text-3xl font-bold text-white sm:text-4xl lg:text-5xl">
-                  ¡Solicita tu cotización <span className="text-primary">Personalizado!</span>
+                  {t("app_dev.cta_title")}
                 </h2>
                 
                 <p className="mt-4 max-w-md text-muted-foreground">
-                  Cuéntanos sobre tu proyecto y te enviaremos una propuesta a la medida de tus necesidades. Sin compromisos.
+                  {t("app_dev.cta_description")}
                 </p>
 
                 <div className="mt-6 flex flex-wrap items-center gap-4">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="h-5 w-5 text-primary" />
-                    <span className="text-sm text-muted-foreground">Sin costo inicial</span>
+                    <span className="text-sm text-muted-foreground">{t("app_dev.cta_free")}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="h-5 w-5 text-primary" />
-                    <span className="text-sm text-muted-foreground">Respuesta en 24h</span>
+                    <span className="text-sm text-muted-foreground">{t("app_dev.cta_response")}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="h-5 w-5 text-primary" />
-                    <span className="text-sm text-muted-foreground">Asesoría gratuita</span>
+                    <span className="text-sm text-muted-foreground">{t("app_dev.cta_advice")}</span>
                   </div>
                 </div>
 
@@ -263,7 +278,7 @@ export default function DesarrolloAplicacionesPage() {
                   href="/cotiza"
                   className="group mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-8 py-4 text-base font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:brightness-110 hover:shadow-xl hover:shadow-primary/40 active:scale-95"
                 >
-                  Solicitar Cotización
+                  {t("app_dev.cta_button")}
                   <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </a>
               </div>
@@ -273,7 +288,7 @@ export default function DesarrolloAplicacionesPage() {
                   <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-primary/20 to-emerald-500/20 blur-3xl" />
                   <img
                     src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQv0d7N4lqcbtRXpXnc45dEpvBzmoC1W7JQBhPnRFAG8g&s=10"
-                    alt="Cotización personalizada Klyro"
+                    alt={t("app_dev.cta_image_alt")}
                     className="relative h-auto w-full max-w-[300px] rounded-3xl object-cover"
                   />
                 </div>

@@ -17,38 +17,16 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Klyro — Soluciones Tecnológicas Inteligentes | Desarrollo de Software",
-  description:
-    "Impulsa tu negocio con soluciones de software a la medida. Desarrollo web, aplicaciones móviles y capacitación tecnológica con estándares de excelencia.",
-  keywords: ["Klyro", "desarrollo de software", "aplicaciones web", "capacitación tecnológica", "software empresarial"],
-  authors: [{ name: "Klyro" }],
-  openGraph: {
-    title: "Klyro — Soluciones Tecnológicas Inteligentes",
-    description: "Impulsa tu negocio con soluciones de software a la medida",
-    type: "website",
-    locale: "es_MX",
-  },
+  title: "Klyro",
+  description: "Impulsa tu negocio con soluciones de software a la medida.",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="es"
-      className={`${instrumentSans.variable} ${inter.variable}`}
-    >
+    <html lang="es" className={`${instrumentSans.variable} ${inter.variable}`}>
       <head>
-        <Script
-          crossOrigin="anonymous"
-          src="//unpkg.com/react-grab/dist/index.global.js"
-        />
-        <Script
-          crossOrigin="anonymous"
-          src="//unpkg.com/same-runtime/dist/index.global.js"
-        />
+        <Script crossOrigin="anonymous" src="//unpkg.com/react-grab/dist/index.global.js" />
+        <Script crossOrigin="anonymous" src="//unpkg.com/same-runtime/dist/index.global.js" />
       </head>
       <body suppressHydrationWarning className="antialiased">
         <ClientBody>{children}</ClientBody>

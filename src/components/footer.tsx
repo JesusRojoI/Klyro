@@ -1,20 +1,41 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import { MapPin, Mail, Phone } from "lucide-react";
 import Image from "next/image";
-
-const developmentLinks = [
-  { label: "Desarrollo de Aplicaciones", href: "/desarrollo-de-aplicaciones/" },
-  { label: "Desarrollo Empresarial", href: "/desarrollo-empresarial/" },
-  { label: "Desarrollo de Software Especializado", href: "/desarrollo-software-especializado/" },
-  { label: "Sistemas de Inventario y Logística", href: "/sistemas-inventario-logistica/" },
-  { label: "Servicios Complementarios", href: "/servicios-complementarios/" },
-];
-
-const trainingLinks = [
-  { label: "Sistemas Informáticos", href: "/#sistemas-informaticos" },
-  { label: "Lenguajes de Programación", href: "/#lenguajes" },
-];
+import { t, getLanguage } from "@/i18n";
 
 export function Footer() {
+  const [lang, setLang] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLang(getLanguage());
+    const handleLangChange = () => setLang(getLanguage());
+    window.addEventListener("languagechange", handleLangChange);
+    return () => window.removeEventListener("languagechange", handleLangChange);
+  }, []);
+
+  if (!lang) {
+    return (
+      <footer className="relative overflow-hidden border-t border-white/10 bg-[#0b0b0d]">
+        <div className="container-dm relative py-16" />
+      </footer>
+    );
+  }
+
+  const developmentLinks = [
+    { label: t("footer.app_dev"), href: "/desarrollo-de-aplicaciones/" },
+    { label: t("footer.business_dev"), href: "/desarrollo-empresarial/" },
+    { label: t("footer.specialized_dev"), href: "/desarrollo-software-especializado/" },
+    { label: t("footer.inventory_dev"), href: "/sistemas-inventario-logistica/" },
+    { label: t("footer.complementary_dev"), href: "/servicios-complementarios/" },
+  ];
+
+  const trainingLinks = [
+    { label: t("footer.training_systems"), href: "/#sistemas-informaticos" },
+    { label: t("footer.training_languages"), href: "/#lenguajes" },
+  ];
+
   return (
     <footer className="relative overflow-hidden border-t border-white/10 bg-[#0b0b0d]">
       <div className="pointer-events-none absolute bottom-0 left-1/2 h-[300px] w-[600px] -translate-x-1/2 bg-primary/10 blur-[120px]" />
@@ -24,20 +45,19 @@ export function Footer() {
           {/* Contact */}
           <div className="space-y-5">
             <FooterContact icon={MapPin}>
-              Calle Campeche 410, Int. A, Col. Hipodromo Condesa, Cuauhtemoc,
-              C.P. 06170, CDMX
+              {t("footer.address")}
             </FooterContact>
             <FooterContact icon={Mail}>
               <a
-                href="mailto:conecta@klyro.mx"
+                href={`mailto:${t("footer.email")}`}
                 className="transition hover:text-primary"
               >
-                conecta@klyro.mx
+                {t("footer.email")}
               </a>
             </FooterContact>
             <FooterContact icon={Phone}>
-              <a href="tel:5555534107" className="transition hover:text-primary">
-                55 5553 4107
+              <a href={`tel:${t("footer.phone").replace(/\s/g, "")}`} className="transition hover:text-primary">
+                {t("footer.phone")}
               </a>
             </FooterContact>
           </div>
@@ -45,7 +65,7 @@ export function Footer() {
           {/* Planes de Desarrollo */}
           <div>
             <h3 className="font-display text-lg font-semibold text-white">
-              Planes de Desarrollo
+              {t("footer.development_plans")}
             </h3>
             <span className="mt-3 block h-0.5 w-12 bg-primary" />
             <ul className="mt-6 space-y-3">
@@ -65,7 +85,7 @@ export function Footer() {
           {/* Capacitaciones */}
           <div>
             <h3 className="font-display text-lg font-semibold text-white">
-              Capacitaciones
+              {t("footer.training")}
             </h3>
             <span className="mt-3 block h-0.5 w-12 bg-primary" />
             <ul className="mt-6 space-y-3">
@@ -94,7 +114,6 @@ export function Footer() {
             style={{ filter: "brightness(0) invert(1)" }}
           />
           
-          {/* Métodos de pago */}
           <div className="flex items-center gap-4">
             <Image
               src="/visa.svg"
@@ -119,19 +138,19 @@ export function Footer() {
         <div className="mt-12 flex flex-col items-center gap-2 border-t border-white/5 pt-8 text-center text-sm text-muted-foreground">
           <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
             <a href="/aviso-de-privacidad/" className="transition hover:text-white">
-              Aviso de Privacidad
+              {t("footer.privacy")}
             </a>
             <span className="text-white/20">|</span>
             <a href="/terminos-y-condiciones/" className="transition hover:text-white">
-              Términos y Condiciones de Uso
+              {t("footer.terms")}
             </a>
             <span className="text-white/20">|</span>
             <a href="/politica-de-reembolso/" className="transition hover:text-white">
-              Política de Reembolso
+              {t("footer.refund")}
             </a>
           </div>
           <p className="mt-2 text-xs text-muted-foreground/70">
-            © {new Date().getFullYear()} Klyro. Todos los derechos reservados.
+            © {new Date().getFullYear()} Klyro. {t("footer.rights")}
           </p>
         </div>
       </div>

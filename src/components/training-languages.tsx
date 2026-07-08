@@ -1,130 +1,141 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
-
-const lenguajes = [
-  {
-    id: 601,
-    nombre: "JavaScript",
-    precio: "3,850 MXN + IVA",
-    descripcion: "Online 10 horas",
-    logo: "/javascript.svg",
-    color: "#F7DF1E",
-    caracteristicas: [
-      "Fundamentos de JavaScript y configuración del entorno",
-      "Sintaxis básica y estructuras de control",
-      "Manipulación del DOM y eventos",
-      "Funciones y objetos",
-      "Introducción a ES6 y promesas",
-      "Uso de herramientas como Node.js y npm",
-    ],
-  },
-  {
-    id: 602,
-    nombre: "Python",
-    precio: "4,200 MXN + IVA",
-    descripcion: "Online 12 horas",
-    logo: "/python.svg",
-    color: "#3776AB",
-    caracteristicas: [
-      "Fundamentos de Python y configuración del entorno",
-      "Estructuras de datos y control de flujo",
-      "Funciones, módulos y paquetes",
-      "Manejo de archivos y excepciones",
-      "Introducción a POO en Python",
-      "Uso de librerías populares (NumPy, Pandas)",
-    ],
-  },
-  {
-    id: 603,
-    nombre: "Java",
-    precio: "4,500 MXN + IVA",
-    descripcion: "Online 14 horas",
-    logo: "/java.svg",
-    color: "#ED8B00",
-    caracteristicas: [
-      "Fundamentos de Java y configuración del entorno",
-      "Programación orientada a objetos",
-      "Manejo de excepciones y colecciones",
-      "Interfaces gráficas con JavaFX",
-      "Conexión a bases de datos con JDBC",
-      "Introducción a Spring Boot",
-    ],
-  },
-  {
-    id: 604,
-    nombre: "C#",
-    precio: "4,350 MXN + IVA",
-    descripcion: "Online 12 horas",
-    logo: "/cpp.svg",
-    color: "#9B4F96",
-    caracteristicas: [
-      "Fundamentos de C# y .NET",
-      "Programación orientada a objetos",
-      "Manejo de excepciones y delegados",
-      "LINQ y manejo de datos",
-      "Desarrollo de aplicaciones Windows Forms",
-      "Introducción a ASP.NET Core",
-    ],
-  },
-  {
-    id: 605,
-    nombre: "PHP",
-    precio: "3,200 MXN + IVA",
-    descripcion: "Online 8 horas",
-    logo: "/php.svg",
-    color: "#777BB4",
-    caracteristicas: [
-      "Fundamentos de PHP y configuración del entorno",
-      "Sintaxis básica y tipos de datos",
-      "Manejo de formularios y sesiones",
-      "Conexión a bases de datos MySQL",
-      "Programación orientada a objetos en PHP",
-      "Introducción a Laravel",
-    ],
-  },
-  {
-    id: 606,
-    nombre: "SQL",
-    precio: "2,800 MXN + IVA",
-    descripcion: "Online 6 horas",
-    logo: "/sql.svg",
-    color: "#00758F",
-    caracteristicas: [
-      "Fundamentos de bases de datos relacionales",
-      "Consultas SELECT avanzadas",
-      "JOINs y subconsultas",
-      "Funciones de agregación y agrupamiento",
-      "Procedimientos almacenados y triggers",
-      "Optimización y buenas prácticas",
-    ],
-  },
-];
+import { t, getLanguage } from "@/i18n";
 
 export function TrainingLanguages() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState(0);
   const [planSeleccionado, setPlanSeleccionado] = useState<number | null>(null);
+  const [lang, setLang] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLang(getLanguage());
+    const handleLangChange = () => setLang(getLanguage());
+    window.addEventListener("languagechange", handleLangChange);
+    return () => window.removeEventListener("languagechange", handleLangChange);
+  }, []);
+
+  if (!lang) {
+    return (
+      <section id="lenguajes" className="relative py-20 md:py-28">
+        <div className="container-dm" />
+      </section>
+    );
+  }
+
+  const lenguajes = [
+    {
+      id: 601,
+      nombre: t("training_languages.javascript"),
+      precio: `3,850 MXN ${t("common.tax")}`,
+      descripcion: t("training_languages.javascript_desc"),
+      logo: "/javascript.svg",
+      caracteristicas: [
+        t("training_languages.javascript_1"),
+        t("training_languages.javascript_2"),
+        t("training_languages.javascript_3"),
+        t("training_languages.javascript_4"),
+        t("training_languages.javascript_5"),
+        t("training_languages.javascript_6"),
+      ],
+    },
+    {
+      id: 602,
+      nombre: t("training_languages.python"),
+      precio: `4,200 MXN ${t("common.tax")}`,
+      descripcion: t("training_languages.python_desc"),
+      logo: "/python.svg",
+      caracteristicas: [
+        t("training_languages.python_1"),
+        t("training_languages.python_2"),
+        t("training_languages.python_3"),
+        t("training_languages.python_4"),
+        t("training_languages.python_5"),
+        t("training_languages.python_6"),
+      ],
+    },
+    {
+      id: 603,
+      nombre: t("training_languages.java"),
+      precio: `4,500 MXN ${t("common.tax")}`,
+      descripcion: t("training_languages.java_desc"),
+      logo: "/java.svg",
+      caracteristicas: [
+        t("training_languages.java_1"),
+        t("training_languages.java_2"),
+        t("training_languages.java_3"),
+        t("training_languages.java_4"),
+        t("training_languages.java_5"),
+        t("training_languages.java_6"),
+      ],
+    },
+    {
+      id: 604,
+      nombre: t("training_languages.csharp"),
+      precio: `4,350 MXN ${t("common.tax")}`,
+      descripcion: t("training_languages.csharp_desc"),
+      logo: "/cpp.svg",
+      caracteristicas: [
+        t("training_languages.csharp_1"),
+        t("training_languages.csharp_2"),
+        t("training_languages.csharp_3"),
+        t("training_languages.csharp_4"),
+        t("training_languages.csharp_5"),
+        t("training_languages.csharp_6"),
+      ],
+    },
+    {
+      id: 605,
+      nombre: t("training_languages.php"),
+      precio: `3,200 MXN ${t("common.tax")}`,
+      descripcion: t("training_languages.php_desc"),
+      logo: "/php.svg",
+      caracteristicas: [
+        t("training_languages.php_1"),
+        t("training_languages.php_2"),
+        t("training_languages.php_3"),
+        t("training_languages.php_4"),
+        t("training_languages.php_5"),
+        t("training_languages.php_6"),
+      ],
+    },
+    {
+      id: 606,
+      nombre: t("training_languages.sql"),
+      precio: `2,800 MXN ${t("common.tax")}`,
+      descripcion: t("training_languages.sql_desc"),
+      logo: "/sql.svg",
+      caracteristicas: [
+        t("training_languages.sql_1"),
+        t("training_languages.sql_2"),
+        t("training_languages.sql_3"),
+        t("training_languages.sql_4"),
+        t("training_languages.sql_5"),
+        t("training_languages.sql_6"),
+      ],
+    },
+  ];
 
   const plan = lenguajes[activeTab];
 
   const handleSeleccionarPlan = (planId: number) => {
     setPlanSeleccionado(planId);
-    const plan = lenguajes.find(p => p.id === planId);
-    if (plan) {
+    const p = lenguajes.find(l => l.id === planId);
+    if (p) {
       const carritoActual = JSON.parse(localStorage.getItem("klyro_carrito") || "[]");
-      const existe = carritoActual.find((item: any) => item.id === plan.id);
+      const existe = carritoActual.find((item: any) => item.id === p.id);
       
       if (existe) {
         existe.cantidad += 1;
       } else {
         carritoActual.push({
-          id: plan.id,
-          nombre: plan.nombre,
-          precio: plan.precio,
+          id: p.id,
+          nombre: p.nombre,
+          precio: p.precio,
           tipo: "Capacitación - Lenguajes de Programación",
           cantidad: 1,
           fecha: new Date().toISOString(),
@@ -140,22 +151,22 @@ export function TrainingLanguages() {
     <section id="lenguajes" className="relative py-20 md:py-28">
       <div className="container-dm">
         <span className="mb-4 inline-block text-sm font-semibold uppercase tracking-[0.25em] text-primary">
-          Capacitación
+          {t("training_languages.badge")}
         </span>
         <h2 className="max-w-2xl font-display text-4xl font-bold leading-[1.05] text-white sm:text-5xl md:text-6xl">
-          Capacitación en Lenguajes de Programación
+          {t("training_languages.title")}
         </h2>
         <p className="mt-5 max-w-xl text-base text-muted-foreground md:text-lg">
-          Domina los lenguajes más demandados con instructores expertos y contenido actualizado.
+          {t("training_languages.description")}
         </p>
 
         {/* Contenedor de pestañas */}
         <div className="mt-12 w-full md:w-[90%] mx-auto">
           {/* Pestañas - tipo navegador */}
           <div className="flex flex-wrap gap-1 border-b border-white/10">
-            {lenguajes.map((lang, index) => (
+            {lenguajes.map((langItem, index) => (
               <button
-                key={lang.id}
+                key={langItem.id}
                 onClick={() => {
                   setActiveTab(index);
                   setPlanSeleccionado(null);
@@ -167,8 +178,8 @@ export function TrainingLanguages() {
                 }`}
               >
                 <Image
-                  src={lang.logo}
-                  alt={lang.nombre}
+                  src={langItem.logo}
+                  alt={langItem.nombre}
                   width={20}
                   height={20}
                   className={`h-5 w-5 object-contain transition-all ${
@@ -180,7 +191,7 @@ export function TrainingLanguages() {
                       : "brightness(0) saturate(100%) invert(50%)",
                   }}
                 />
-                <span className="hidden sm:inline">{lang.nombre}</span>
+                <span className="hidden sm:inline">{langItem.nombre}</span>
                 {activeTab === index && (
                   <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
                 )}
@@ -227,11 +238,11 @@ export function TrainingLanguages() {
                   {planSeleccionado === plan.id ? (
                     <>
                       <CheckCircle2 className="h-5 w-5" />
-                      Plan Seleccionado
+                      {t("training_languages.plan_selected")}
                     </>
                   ) : (
                     <>
-                      Seleccionar Plan
+                      {t("training_languages.select_plan")}
                       <ArrowRight className="h-5 w-5" />
                     </>
                   )}
@@ -241,7 +252,7 @@ export function TrainingLanguages() {
               {/* Características */}
               <div className="md:w-[55%] flex flex-col justify-center">
                 <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-primary">
-                  Contenido del curso
+                  {t("training_languages.content")}
                 </h4>
                 <ul className="space-y-3">
                   {plan.caracteristicas.map((caract, i) => (
