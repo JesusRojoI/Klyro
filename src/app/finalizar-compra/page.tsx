@@ -104,8 +104,8 @@ export default function FinalizarCompraPage() {
       });
       const result = await response.json();
       if (result.success) {
-        await enviarConfirmacionCompra({ nombre: formData.nombre, email: formData.email, productos: carrito, total: formatearPrecio(calcularTotal()) });
-        await notificarAdmin({ nombre: nombreCompleto, email: formData.email, total: formatearPrecio(calcularTotal()) }, "Compra");
+        await enviarConfirmacionCompra({ nombre: formData.nombre, email: formData.email, productos: carrito,idioma: lang || 'es', total: formatearPrecio(calcularTotal()) });
+        await notificarAdmin({ nombre: nombreCompleto, email: formData.email,idioma: lang || 'es', total: formatearPrecio(calcularTotal()) }, "Compra");
         localStorage.setItem("klyro_ultima_orden", JSON.stringify({ orderId, nombre: nombreCompleto, email: formData.email, productos: carrito, subtotal: calcularSubtotal(), iva: calcularIVA(), descuento, total: calcularTotal(), fecha: new Date().toISOString() }));
         localStorage.removeItem("klyro_carrito");
         router.push("/compra-exitosa");

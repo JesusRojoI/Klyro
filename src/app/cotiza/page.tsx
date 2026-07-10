@@ -115,6 +115,7 @@ export default function CotizaPage() {
       servicio: formData.areaInteres,
       cotizacionId: cotizacionId,
       monto: montoCotizacion,
+      idioma: lang || 'es', 
     });
 
     await notificarAdmin({
@@ -123,6 +124,7 @@ export default function CotizaPage() {
       servicio: formData.areaInteres,
       cotizacionId: cotizacionId,
       monto: montoCotizacion,
+      idioma: lang || 'es', 
     }, "Cotización");
 
     setStep(4);
