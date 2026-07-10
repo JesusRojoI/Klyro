@@ -2,6 +2,7 @@
 
 import { Resend } from 'resend';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let resendInstance: any = null;
 
 if (typeof window === 'undefined') {
@@ -17,8 +18,10 @@ if (typeof window === 'undefined') {
   }
 }
 
-const templates = {
-  cotizacionCliente: (data: any) => {
+type TemplateFn = (data: Record<string, unknown>) => { subject: string; html: string };
+
+const templates: Record<string, TemplateFn> = {
+  cotizacionCliente: (data) => {
     const es = data.idioma === 'es';
     
     return {
@@ -73,7 +76,7 @@ const templates = {
     };
   },
 
-  cotizacionAdmin: (data: any) => {
+  cotizacionAdmin: (data) => {
     const es = data.idioma === 'es';
     return {
       subject: `📋 ${es ? 'Nueva Cotización' : 'New Quote'} - ${data.cotizacionId}`,
@@ -113,7 +116,7 @@ const templates = {
     };
   },
 
-  paymentConfirmation: (data: any) => {
+  paymentConfirmation: (data) => {
     const es = data.idioma === 'es';
     return {
       subject: es 
@@ -165,7 +168,7 @@ const templates = {
 export async function sendEmail({ to, template, data }: {
   to: string;
   template: keyof typeof templates;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
 }) {
   if (typeof window !== 'undefined') {
     console.warn('⚠️ sendEmail no puede ejecutarse en el cliente');
@@ -220,7 +223,7 @@ export async function enviarConfirmacionCotizacion(data: {
 export async function enviarConfirmacionCompra(data: {
   nombre: string;
   email: string;
-  productos?: any[];
+  productos?: unknown[];
   total?: string;
   idioma?: string;
 }) {

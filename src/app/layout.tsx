@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Instrument_Sans, Inter } from "next/font/google";
 import "./globals.css";
 import ClientBody from "./ClientBody";
-import Script from "next/script";
 
 const instrumentSans = Instrument_Sans({
   variable: "--font-display",
@@ -24,10 +23,6 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className={`${instrumentSans.variable} ${inter.variable}`}>
-      <head>
-        <Script crossOrigin="anonymous" src="//unpkg.com/react-grab/dist/index.global.js" />
-        <Script crossOrigin="anonymous" src="//unpkg.com/same-runtime/dist/index.global.js" />
-      </head>
       <body suppressHydrationWarning className="antialiased">
         <ClientBody>{children}</ClientBody>
       </body>

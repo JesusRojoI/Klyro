@@ -12,16 +12,12 @@ const compat = new FlatCompat({
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
-    languageOptions: {
-      parserOptions: {
-        warnOnUnsupportedTypeScriptVersion: false,
-      },
-    },
     rules: {
-      "@typescript-eslint/no-unused-vars": "off",
-      "react/no-unescaped-entities": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@next/next/no-html-link-for-pages": "off",
+      "@typescript-eslint/no-unused-vars": "warn",
       "@next/next/no-img-element": "off",
-      "jsx-a11y/alt-text": "off",
+      "react/no-unescaped-entities": "off",
     },
   },
 ];
