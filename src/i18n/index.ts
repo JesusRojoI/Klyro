@@ -1,11 +1,15 @@
 import es from './es.json';
 import en from './en.json';
 
-const translations: { [key: string]: any } = { es, en };
+const translations: Record<string, unknown> = { es, en };
+
+let currentLang = 'es';
 
 export function setLanguage(lang: string) {
+  currentLang = lang;
   if (typeof window !== 'undefined') {
     localStorage.setItem('klyro_lang', lang);
+    document.cookie = `klyro_lang=${lang}; path=/; max-age=31536000`;
     window.dispatchEvent(new Event('languagechange'));
   }
 }
@@ -20,7 +24,8 @@ export function getLanguage(): string {
 export function t(key: string): string {
   const lang = getLanguage();
   const keys = key.split('.');
-  let value = translations[lang];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let value: any = translations[lang];
   for (const k of keys) {
     value = value?.[k];
   }

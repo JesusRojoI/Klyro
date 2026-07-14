@@ -1,7 +1,30 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
+import { t, getLanguage } from "@/i18n";
 
 export default function PoliticaReembolsoPage() {
+  const [lang, setLang] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLang(getLanguage());
+    const handleLangChange = () => setLang(getLanguage());
+    window.addEventListener("languagechange", handleLangChange);
+    return () => window.removeEventListener("languagechange", handleLangChange);
+  }, []);
+
+  if (!lang) {
+    return (
+      <main className="relative min-h-screen bg-background">
+        <Navbar />
+        <section className="pt-32 pb-20"><div className="container-dm" /></section>
+        <Footer />
+      </main>
+    );
+  }
+
   return (
     <main className="relative min-h-screen bg-background">
       <Navbar />
@@ -9,65 +32,76 @@ export default function PoliticaReembolsoPage() {
       <section className="pt-32 pb-20">
         <div className="container-dm max-w-3xl">
           <div className="mb-8 flex items-center gap-2 text-sm text-muted-foreground">
-            <a href="/" className="hover:text-primary transition-colors">Inicio</a>
+            <a href="/" className="hover:text-primary transition-colors">{t("footer.privacy").split(" ")[0]}</a>
             <span>/</span>
-            <span className="text-white">Política de Reembolso</span>
+            <span className="text-white">{t("refund.title")}</span>
           </div>
 
           <h1 className="font-display text-4xl font-bold text-white sm:text-5xl">
-            Política de Reembolso
+            {t("refund.title")}
           </h1>
           
           <p className="mt-4 text-sm text-muted-foreground">
-            Última actualización: {new Date().toLocaleDateString("es-MX")}
+            {t("refund.last_update")}: {new Date().toLocaleDateString(lang === "en" ? "en-US" : "es-MX")}
           </p>
 
           <div className="mt-10 space-y-8 text-muted-foreground leading-relaxed">
             <div>
-              <h2 className="text-xl font-semibold text-white mb-3">1. Plazo de Reembolso</h2>
-              <p>
-                Los clientes tienen derecho a solicitar un reembolso dentro de los primeros 5 días hábiles posteriores a la contratación del servicio, siempre que no se haya iniciado el trabajo de desarrollo o capacitación.
-              </p>
+              <h2 className="text-xl font-semibold text-white mb-3">{t("refund.section1_title")}</h2>
+              <p>{t("refund.section1_text")}</p>
             </div>
 
             <div>
-              <h2 className="text-xl font-semibold text-white mb-3">2. Servicios de Desarrollo de Software</h2>
-              <p>
-                Para servicios de desarrollo de software, el reembolso aplica únicamente si el proyecto no ha iniciado. Una vez comenzado el desarrollo, se evaluará el porcentaje de avance para determinar el monto a reembolsar, descontando las horas trabajadas.
-              </p>
+              <h2 className="text-xl font-semibold text-white mb-3">{t("refund.section2_title")}</h2>
+              <p>{t("refund.section2_text")}</p>
             </div>
 
             <div>
-              <h2 className="text-xl font-semibold text-white mb-3">3. Servicios de Capacitación</h2>
-              <p>
-                Para cursos y capacitaciones, se aceptan cancelaciones hasta 48 horas antes del inicio del curso con reembolso completo. Cancelaciones con menos de 48 horas de anticipación tendrán un cargo del 30% del valor del curso.
-              </p>
+              <h2 className="text-xl font-semibold text-white mb-3">{t("refund.section3_title")}</h2>
+              <p>{t("refund.section3_text")}</p>
             </div>
 
             <div>
-              <h2 className="text-xl font-semibold text-white mb-3">4. Proceso de Reembolso</h2>
-              <p>
-                Para solicitar un reembolso, el cliente debe enviar un correo a <a href="mailto:contacto@klyro.mx" className="text-primary hover:underline">contacto@klyro.mx</a> con el asunto "Solicitud de Reembolso", incluyendo el ID de cotización, nombre completo y motivo de la solicitud.
-              </p>
-              <p className="mt-2">
-                Una vez aprobada la solicitud, el reembolso se procesará en un plazo de 5 a 10 días hábiles a través del mismo método de pago utilizado.
-              </p>
-            </div>
-
-            <div>
-              <h2 className="text-xl font-semibold text-white mb-3">5. Casos No Reembolsables</h2>
+              <h2 className="text-xl font-semibold text-white mb-3">{t("refund.section4_title")}</h2>
+              <p>{t("refund.section4_text")}</p>
               <ul className="mt-2 list-disc pl-6 space-y-1">
-                <li>Servicios completados y entregados al cliente</li>
-                <li>Cursos de capacitación ya impartidos total o parcialmente</li>
-                <li>Servicios personalizados que requirieron preparación previa significativa</li>
-                <li>Solicitudes fuera del plazo establecido</li>
+                <li>{t("refund.section4_option1")}</li>
+                <li>{t("refund.section4_option2")}</li>
               </ul>
             </div>
 
             <div>
-              <h2 className="text-xl font-semibold text-white mb-3">6. Contacto</h2>
+              <h2 className="text-xl font-semibold text-white mb-3">{t("refund.section5_title")}</h2>
+              <p>{t("refund.section5_text")}</p>
+              <ul className="mt-2 list-disc pl-6 space-y-1">
+                {[1,2,3,4].map((i) => (
+                  <li key={i}>{t(`refund.section5_list.${i-1}`)}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h2 className="text-xl font-semibold text-white mb-3">{t("refund.section6_title")}</h2>
+              <p>{t("refund.section6_text")}</p>
+              <ul className="mt-2 list-disc pl-6 space-y-1">
+                {[1,2,3,4].map((i) => (
+                  <li key={i}>{t(`refund.section6_list.${i-1}`)}</li>
+                ))}
+              </ul>
+              <p className="mt-3">{t("refund.section6_response")}</p>
+            </div>
+
+            <div>
+              <h2 className="text-xl font-semibold text-white mb-3">{t("refund.section7_title")}</h2>
+              <p>{t("refund.section7_text")}</p>
+            </div>
+
+            <div>
+              <h2 className="text-xl font-semibold text-white mb-3">{t("refund.section8_title")}</h2>
               <p>
-                Para cualquier duda sobre nuestra política de reembolso: <a href="mailto:contacto@klyro.mx" className="text-primary hover:underline">contacto@klyro.mx</a>
+                {t("refund.section8_text")}{" "}
+                <a href="mailto:conecta@klyro.mx" className="text-primary hover:underline">conecta@klyro.mx</a>{" "}
+                {t("refund.section8_text2")}
               </p>
             </div>
           </div>
