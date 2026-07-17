@@ -25,9 +25,7 @@ const templates: Record<string, TemplateFn> = {
     const es = data.idioma === 'es';
     
     return {
-      subject: es 
-        ? `📋 Cotización Recibida - Klyro (${data.cotizacionId})`
-        : `📋 Quote Received - Klyro (${data.cotizacionId})`,
+      subject: `📋 ${es ? 'Nueva Cotización' : 'New Quote'} - Klyro`,
       html: `
         <!DOCTYPE html>
         <html>

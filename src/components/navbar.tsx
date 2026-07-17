@@ -10,10 +10,29 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const [lang, setLang] = useState("es");
   const [mounted, setMounted] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
     setLang(getLanguage());
     setMounted(true);
+  }, []);
+
+  // Escuchar cambios en el carrito
+  useEffect(() => {
+    const updateCartCount = () => {
+      const carrito = JSON.parse(localStorage.getItem("klyro_carrito") || "[]");
+      const total = carrito.reduce((sum: number, item: { cantidad: number }) => sum + (item.cantidad || 1), 0);
+      setCartCount(total);
+    };
+
+    updateCartCount();
+    window.addEventListener("cartUpdated", updateCartCount);
+    window.addEventListener("storage", updateCartCount);
+    
+    return () => {
+      window.removeEventListener("cartUpdated", updateCartCount);
+      window.removeEventListener("storage", updateCartCount);
+    };
   }, []);
 
   useEffect(() => {
@@ -74,6 +93,11 @@ export function Navbar() {
 
           <a href="/carrito" className="relative flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary">
             <ShoppingCart className="h-5 w-5" />
+            {cartCount > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-white shadow-lg shadow-primary/30">
+                {cartCount > 99 ? "99+" : cartCount}
+              </span>
+            )}
           </a>
 
           <a href="/cotiza" className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_30px_-8px_rgba(31,218,113,0.7)] transition-transform hover:scale-[1.03] active:scale-95 sm:px-6">

@@ -242,6 +242,18 @@
   "back_home": "Volver al inicio"
 },
   "cotiza": {
+    "pending": "Pendiente",
+"to_define": "Por definir",
+    "id_placeholder": "Ej: 123",
+    "step1_desc": "Completa el formulario y recibe tu ID de cotización por correo.",
+"step2_desc": "Nuestro equipo revisará tu solicitud y preparará una cotización personalizada para ti.",
+"step3_desc": "Agrega el ID de Cotización y el Monto Asignado. Validaremos el pago y diseñaremos una estrategia a tu medida.",
+"sending": "Enviando...",
+"sent_title": "¡Solicitud Enviada!",
+"sent_text": "Tu solicitud se envió correctamente. ¡Gracias!",
+"sent_email": "Hemos enviado un correo de confirmación a",
+"monto_placeholder": "A la medida cantidad",
+
   "step1_sub": "Contáctanos", "step1_title": "Ponte en contacto con nosotros",
   "step2_sub": "Cotización", "step2_title": "Recibe una cotización a tu medida",
   "step3_sub": "Pago", "step3_title": "Realiza el pago de la cotización aquí mismo",
@@ -561,5 +573,8 @@
   "section8_title": "VIII. Contacto",
   "section8_text": "Para dudas, aclaraciones o solicitudes relacionadas con la presente política, el cliente podrá comunicarse al correo electrónico",
   "section8_text2": "o acudir al domicilio de la Empresa en Calle Campeche 410, Interior A, Colonia Hipódromo Condesa, Alcaldía Cuauhtémoc, C.P. 06170, Ciudad de México."
-}
+},
+"id_placeholder": "Ej: MI-PROYECTO-2026",
+"error_id_short": "El ID debe tener al menos 3 caracteres",
+"error_id_long": "El ID no puede exceder 50 caracteres"
 }

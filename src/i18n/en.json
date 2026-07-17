@@ -242,6 +242,18 @@
   "back_home": "Back to home"
 },
   "cotiza": {
+    "pending": "Pending",
+"to_define": "To be defined",
+    "id_placeholder": "Ex: 123",
+
+    "step1_desc": "Complete the form and receive your quote ID by email.",
+"step2_desc": "Our team will review your request and prepare a customized quote for you.",
+"step3_desc": "Add the Quote ID and the Assigned Amount. We will validate the payment and design a strategy tailored to you.",
+"sending": "Sending...",
+"sent_title": "Request Sent!",
+"sent_text": "Your request was sent successfully. Thank you!",
+"sent_email": "We have sent a confirmation email to",
+"monto_placeholder": "Custom amount",
   "step1_sub": "Contact", "step1_title": "Get in touch with us",
   "step2_sub": "Quote", "step2_title": "Receive a custom quote",
   "step3_sub": "Payment", "step3_title": "Make the payment here",

@@ -54,9 +54,10 @@ export default function CarritoPage() {
   }, []);
 
   const guardarCarrito = (nuevoCarrito: ProductoCarrito[]) => {
-    localStorage.setItem("klyro_carrito", JSON.stringify(nuevoCarrito));
-    setCarrito(nuevoCarrito);
-  };
+  localStorage.setItem("klyro_carrito", JSON.stringify(nuevoCarrito));
+  setCarrito(nuevoCarrito);
+  window.dispatchEvent(new Event("cartUpdated"));
+};
 
   const actualizarCantidad = (id: number, delta: number) => {
     const nuevoCarrito = carrito.map(item => {

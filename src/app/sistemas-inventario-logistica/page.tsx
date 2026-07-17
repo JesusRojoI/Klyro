@@ -99,6 +99,8 @@ export default function SistemasInventarioLogisticaPage() {
             <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">{t("inventory.description")}</p>
           </div>
           <div className="mt-12 flex justify-center">
+            
+            
             <div className="relative"><div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-primary/20 to-emerald-500/20 blur-3xl" /><img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&h=300&fit=crop" alt={t("inventory.image_alt")} className="relative h-48 w-full max-w-[600px] rounded-3xl border border-white/10 object-cover backdrop-blur-sm sm:h-64" /></div>
           </div>
         </div>
@@ -134,7 +136,7 @@ export default function SistemasInventarioLogisticaPage() {
             <div className="pointer-events-none absolute -bottom-20 -left-20 h-[250px] w-[250px] rounded-full bg-emerald-500/10 blur-[100px]" />
             <div className="relative grid grid-cols-1 items-center gap-10 p-8 md:grid-cols-2 md:p-12 lg:p-16">
               <div className="z-10"><div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-sm text-primary"><Sparkles className="h-4 w-4" />{t("inventory.cta_badge")}</div><h2 className="mt-6 font-display text-3xl font-bold text-white sm:text-4xl lg:text-5xl">{t("inventory.cta_title")}</h2><p className="mt-4 max-w-md text-muted-foreground">{t("inventory.cta_description")}</p><div className="mt-6 flex flex-wrap items-center gap-4"><div className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-primary" /><span className="text-sm text-muted-foreground">{t("inventory.cta_free")}</span></div><div className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-primary" /><span className="text-sm text-muted-foreground">{t("inventory.cta_response")}</span></div><div className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-primary" /><span className="text-sm text-muted-foreground">{t("inventory.cta_advice")}</span></div></div><a href="/cotiza" className="group mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-8 py-4 text-base font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:brightness-110 hover:shadow-xl hover:shadow-primary/40 active:scale-95">{t("inventory.cta_button")}<ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" /></a></div>
-              <div className="relative z-10 flex justify-center"><div className="relative"><div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-primary/20 to-emerald-500/20 blur-3xl" /><img src="https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=300&h=300&fit=crop" alt={t("inventory.cta_image_alt")} className="relative h-auto w-full max-w-[300px] rounded-3xl object-cover" /></div></div>
+              <div className="relative z-10 flex justify-center"><div className="relative"><div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-primary/20 to-emerald-500/20 blur-3xl" /><img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=300&h=300&fit=crop" alt={t("inventory.cta_image_alt")} className="relative h-auto w-full max-w-[300px] rounded-3xl object-cover" /></div></div>
             </div>
           </div>
         </div>
